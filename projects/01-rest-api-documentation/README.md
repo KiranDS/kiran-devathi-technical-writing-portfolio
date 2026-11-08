@@ -1,18 +1,41 @@
-# Project 01 — LedgerLite REST API
+# LedgerLite API — Developer Documentation
 
-**Project type:** Fictional API documentation sample  
-**Audience:** Developers integrating a payment ledger service  
-**Purpose:** Demonstrate how I structure API documentation, explain authentication, document endpoints, and communicate errors.
+**Portfolio case study | Fictional product | API v1 | OpenAPI 3.1.0**
 
-> LedgerLite is a fictional product. The API, endpoints, payloads, and examples in this project are illustrative and are not connected to a real service.
+LedgerLite is a fictional account-ledger service. This project demonstrates end-to-end API documentation: onboarding, authentication, endpoint references, request/response models, error handling, operational conventions, security guidance, and an OpenAPI contract.
 
-## Contents
+> **Important:** LedgerLite and all IDs, payloads, tokens, and endpoints are fictional. The `.example` hostname is reserved for examples. This is not a live financial service and must not be used to process real transactions.
 
-- [API overview](api-overview.md)
-- [Authentication](authentication.md)
-- [Create a ledger entry](create-ledger-entry.md)
-- [Errors](errors.md)
+## Start here
+
+| Task | Documentation |
+|---|---|
+| Understand the API | [Overview](docs/api-overview.md) |
+| Make a sample request | [Quickstart](docs/quickstart.md) |
+| Understand credentials | [Authentication](docs/authentication.md) |
+| Create an entry | [Create entry](docs/endpoints/create-ledger-entry.md) |
+| Retrieve an entry | [Retrieve entry](docs/endpoints/retrieve-ledger-entry.md) |
+| List account entries | [List entries](docs/endpoints/list-ledger-entries.md) |
+| Handle failures | [Errors](docs/errors.md) |
+| Understand conventions | [API conventions](docs/api-conventions.md) |
+| Review security guidance | [Security](docs/security.md) |
+| Inspect the machine-readable contract | [OpenAPI 3.1](openapi/ledgerlite-v1.yaml) |
+
+## API at a glance
+
+- Base URL: `https://api.ledgerlite.example/v1`
+- Transport: HTTPS
+- Media type: `application/json`
+- Authentication: Bearer token
+- Pagination: Cursor-based
+- Duplicate create protection: `Idempotency-Key`
+
+## Resource model
+
+A ledger entry records an amount, currency, direction, description, status, and creation timestamp. Entries are immutable in this sample. Amounts use integer minor units: `12550` in USD represents USD 125.50. A production implementation must define supported currencies and precision rules authoritatively.
 
 ## Scope and assumptions
 
-This sample uses illustrative REST conventions and JSON payloads. It is a writing and information-architecture exercise, not a claim that a working API exists. Endpoint behavior and schemas would normally be validated with the API owner and tested against a working environment before publication.
+The API supports creating an entry, retrieving one entry, and listing entries for an account. Account provisioning, balances, settlement, payment initiation, refunds, webhooks, and reconciliation are out of scope. A `201 Created` response does not imply settlement or funds availability.
+
+This is a coherent illustrative contract, not a tested implementation. In a real project, confirm all assumptions with Product, Engineering, QA, and Security before publication.

@@ -1,0 +1,10 @@
+{
+  "id": "le_01J9M8K7W6V5T4S3R2Q1P0NABC",
+  "account_id": "acct_8f3a21",
+  "amount_minor": 12550,
+  "currency": "USD",
+  "direction": "credit",
+  "description": "Invoice INV-2048 payment",
+  "status": "posted",
+  "created_at": "2026-10-15T10:05:00Z"
+}

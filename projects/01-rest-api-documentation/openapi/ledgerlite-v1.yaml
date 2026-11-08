@@ -1,0 +1,257 @@
+openapi: 3.1.0
+info:
+  title: LedgerLite API
+  version: 1.0.0
+  summary: Illustrative account-ledger API for a technical-writing portfolio.
+  description: |
+    LedgerLite is fictional. The .example hostname is reserved for examples
+    and is not a live service. This contract has not been validated against
+    a running implementation.
+servers:
+  - url: https://api.ledgerlite.example/v1
+    description: Fictional example server; not reachable.
+tags:
+  - name: Ledger entries
+    description: Create and retrieve immutable ledger entries.
+security:
+  - oauth2Auth: []
+paths:
+  /ledger-entries:
+    post:
+      tags: [Ledger entries]
+      operationId: createLedgerEntry
+      summary: Create a ledger entry
+      description: Creates an immutable ledger entry for an account.
+      security:
+        - oauth2Auth: [ledger.entries:write]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLedgerEntryRequest'
+            example:
+              account_id: acct_8f3a21
+              amount_minor: 12550
+              currency: USD
+              direction: credit
+              description: Invoice INV-2048 payment
+      responses:
+        '201':
+          description: Entry created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerEntry'
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409':
+          description: Idempotency key reused with a different request body.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /ledger-entries/{entry_id}:
+    get:
+      tags: [Ledger entries]
+      operationId: getLedgerEntry
+      summary: Retrieve a ledger entry
+      security:
+        - oauth2Auth: [ledger.entries:read]
+      parameters:
+        - name: entry_id
+          in: path
+          required: true
+          description: Opaque ledger entry ID.
+          schema: {type: string}
+          example: le_01J9M8K7W6V5T4S3R2Q1P0NABC
+      responses:
+        '200':
+          description: Entry retrieved.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LedgerEntry'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /accounts/{account_id}/ledger-entries:
+    get:
+      tags: [Ledger entries]
+      operationId: listLedgerEntries
+      summary: List ledger entries for an account
+      description: Returns entries in descending created_at order using cursor pagination.
+      security:
+        - oauth2Auth: [ledger.entries:read]
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          schema: {type: string}
+          description: Account whose entries are requested.
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+          description: Maximum number of entries to return.
+        - name: cursor
+          in: query
+          required: false
+          schema: {type: string}
+          description: Opaque cursor from a previous response.
+        - name: direction
+          in: query
+          required: false
+          schema: {$ref: '#/components/schemas/EntryDirection'}
+          description: Filter by credit or debit.
+      responses:
+        '200':
+          description: Page returned.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LedgerEntryList'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+components:
+  securitySchemes:
+    oauth2Auth:
+      type: oauth2
+      description: Illustrative OAuth 2.0 client-credentials flow. The fictional token endpoint is not live.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.ledgerlite.example/oauth/token
+          scopes:
+            ledger.entries:read: Retrieve and list ledger entries.
+            ledger.entries:write: Create ledger entries.
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Reuse the same key and body when retrying one logical create operation.
+      schema: {type: string, minLength: 1, maxLength: 255}
+      example: 8e03978e-40d5-43e8-bc93-6894a57f9324
+  schemas:
+    EntryDirection:
+      type: string
+      enum: [credit, debit]
+    CreateLedgerEntryRequest:
+      type: object
+      additionalProperties: false
+      required: [account_id, amount_minor, currency, direction, description]
+      properties:
+        account_id: {type: string, minLength: 1, example: acct_8f3a21}
+        amount_minor:
+          type: integer
+          minimum: 1
+          description: Positive amount in the currency minor unit.
+          example: 12550
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Three-letter uppercase code; supported currencies are not enumerated here.
+          example: USD
+        direction: {$ref: '#/components/schemas/EntryDirection'}
+        description: {type: string, minLength: 1, maxLength: 140, example: Invoice INV-2048 payment}
+    LedgerEntry:
+      type: object
+      additionalProperties: false
+      required: [id, account_id, amount_minor, currency, direction, description, status, created_at]
+      properties:
+        id: {type: string, example: le_01J9M8K7W6V5T4S3R2Q1P0NABC}
+        account_id: {type: string, example: acct_8f3a21}
+        amount_minor: {type: integer, minimum: 1, example: 12550}
+        currency: {type: string, pattern: '^[A-Z]{3}$', example: USD}
+        direction: {$ref: '#/components/schemas/EntryDirection'}
+        description: {type: string, minLength: 1, maxLength: 140}
+        status:
+          type: string
+          enum: [posted]
+          description: Entry creation status in this sample; not settlement or funds availability.
+        created_at:
+          type: string
+          format: date-time
+          description: UTC timestamp.
+          example: '2026-10-15T10:05:00Z'
+    LedgerEntryList:
+      type: object
+      additionalProperties: false
+      required: [data, next_cursor]
+      properties:
+        data:
+          type: array
+          items: {$ref: '#/components/schemas/LedgerEntry'}
+        next_cursor:
+          type: [string, 'null']
+          description: Opaque cursor for the next page, or null when no more results exist.
+          example: eyJvZmZzZXQiOjJ9
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, request_id]
+          properties:
+            code: {type: string, example: invalid_request}
+            message: {type: string, example: The amount_minor field must be greater than zero.}
+            request_id: {type: string, example: req_7f31a2}
+  responses:
+    BadRequest:
+      description: Request syntax or field validation failed.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Unauthorized:
+      description: Missing, invalid, or expired bearer token.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Forbidden:
+      description: Token lacks required scope or account access.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    NotFound:
+      description: Resource does not exist or is not visible to caller.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    RateLimited:
+      description: Rate limit exceeded; honor Retry-After when supplied.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying, when supplied.
+          schema: {type: integer, minimum: 0}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    InternalError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Unavailable:
+      description: Service temporarily unavailable; honor Retry-After when supplied.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying, when supplied.
+          schema: {type: integer, minimum: 0}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
