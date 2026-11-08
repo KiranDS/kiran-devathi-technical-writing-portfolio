@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LedgerLite API Documentation</title>
+  <style>
+    :root { color-scheme: light; --ink:#172033; --muted:#526078; --line:#dce3ed; --accent:#2457c5; --surface:#f5f7fb; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif; color:var(--ink); background:var(--surface); }
+    header { background:#111827; color:#fff; padding:48px 24px; }
+    header div, main, footer { max-width:960px; margin:auto; }
+    header p { color:#d1d9e6; max-width:700px; }
+    main { padding:32px 24px 56px; }
+    .notice { border-left:4px solid #d97706; background:#fff8e8; padding:14px 18px; border-radius:6px; margin:0 0 28px; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; }
+    a.card { display:block; background:white; border:1px solid var(--line); border-radius:10px; padding:22px; color:inherit; text-decoration:none; }
+    a.card:hover { border-color:var(--accent); box-shadow:0 5px 20px #17203312; }
+    h1 { font-size:clamp(2rem,5vw,3rem); margin:0 0 8px; }
+    h2 { margin-top:32px; }
+    h3 { margin:0 0 8px; color:var(--accent); }
+    .muted { color:var(--muted); }
+    code { background:#edf1f7; padding:2px 5px; border-radius:4px; }
+    footer { padding:0 24px 32px; color:var(--muted); font-size:.9rem; }
+  </style>
+</head>
+<body>
+<header><div>
+  <p>DEVELOPER DOCUMENTATION · API V1</p>
+  <h1>LedgerLite API</h1>
+  <p>Documentation for a fictional account-ledger REST API. Explore the endpoint reference, inspect the OpenAPI contract, and review example requests and responses.</p>
+</div></header>
+<main>
+  <div class="notice"><strong>Portfolio demonstration:</strong> LedgerLite is fictional. The <code>.example</code> hostname is reserved for examples. No live service or real financial processing is provided.</div>
+  <h2>Explore the API</h2>
+  <div class="cards">
+    <a class="card" href="redoc.html"><h3>API Reference</h3><p>Browse endpoint descriptions, parameters, schemas, responses, and examples in a structured reference.</p><strong>Open Redoc reference →</strong></a>
+    <a class="card" href="swagger.html"><h3>Interactive API Explorer</h3><p>Inspect the OpenAPI contract in Swagger UI. The example host is fictional, so live requests will not succeed.</p><strong>Open Swagger UI →</strong></a>
+    <a class="card" href="openapi/ledgerlite-v1.yaml"><h3>OpenAPI Contract</h3><p>View or download the machine-readable OpenAPI 3.1.0 YAML definition.</p><strong>View YAML →</strong></a>
+  </div>
+  <h2>What is documented?</h2>
+  <ul>
+    <li>Create a ledger entry with idempotency protection.</li>
+    <li>Retrieve an entry by its identifier.</li>
+    <li>List account entries using cursor-based pagination.</li>
+    <li>Bearer authentication, illustrative OAuth scopes, error responses, and retry guidance.</li>
+  </ul>
+  <p class="muted">This reference is generated from the OpenAPI contract maintained in the portfolio repository. Contract details are illustrative and have not been verified against a running implementation.</p>
+</main>
+<footer>LedgerLite API · Portfolio case study · Version 1.0.0</footer>
+</body>
+</html>
