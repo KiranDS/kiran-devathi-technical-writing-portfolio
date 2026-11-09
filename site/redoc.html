@@ -6,19 +6,12 @@
   <meta name="description" content="LedgerLite fictional REST API reference">
   <title>LedgerLite API Reference</title>
   <style>
-    :root { color-scheme: light; }
     body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, sans-serif; }
-    .top {
-      position: sticky; top: 0; z-index: 10;
-      padding: 12px 22px; background: #111827;
-    }
+    .top { position: sticky; top: 0; z-index: 10; padding: 12px 22px; background: #111827; }
     .top a { color: #fff; }
     #redoc-container { min-height: 70vh; }
-    #load-error {
-      display: none; margin: 24px; padding: 18px;
-      border: 1px solid #d97706; border-radius: 8px;
-      background: #fff8e8; color: #33220a;
-    }
+    #load-error { display:none; margin:24px; padding:18px; border:1px solid #d97706;
+      border-radius:8px; background:#fff8e8; color:#33220a; }
   </style>
 </head>
 <body>
@@ -26,52 +19,57 @@
   <main>
     <div id="load-error" role="alert">
       <strong>The API reference could not be rendered.</strong>
-      <p>Check that the OpenAPI file is available at <code>./openapi/ledgerlite-v1.yaml</code>
-      and that the Redoc script can load from the CDN. You can still inspect the
-      <a href="./openapi/ledgerlite-v1.yaml">OpenAPI YAML</a> or use
-      <a href="./swagger.html">Swagger UI</a>.</p>
+      <p id="error-detail">Check the browser console and network requests for details.</p>
+      <p>You can still inspect the <a href="./openapi/ledgerlite-v1.yaml">OpenAPI YAML</a>
+      or use <a href="./swagger.html">Swagger UI</a>.</p>
     </div>
     <div id="redoc-container"></div>
   </main>
-
   <script>
     (function () {
-      const showError = () => {
-        document.getElementById("load-error").style.display = "block";
-      };
-
+      const errorBox = document.getElementById("load-error");
+      const errorDetail = document.getElementById("error-detail");
+      function showError(message) {
+        errorDetail.textContent = message || "The Redoc library or OpenAPI specification could not be loaded.";
+        errorBox.style.display = "block";
+      }
       const script = document.createElement("script");
       script.src = "https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js";
       script.onload = function () {
         if (!window.Redoc || typeof window.Redoc.init !== "function") {
-          showError();
+          showError("The Redoc script loaded, but the Redoc.init function was not found.");
           return;
         }
-
-        window.Redoc.init(
-          "./openapi/ledgerlite-v1.yaml",
-          {
-            scrollYOffset: 48,
-            hideDownloadButton: false,
-            expandResponses: "200,201",
-            requiredPropsFirst: true,
-            theme: {
-              colors: {
-                primary: { main: "#2457c5" }
-              },
-              typography: {
-                fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
-                headings: {
-                  fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif"
+        try {
+          const result = window.Redoc.init(
+            "./openapi/ledgerlite-v1.yaml",
+            {
+              scrollYOffset: 48,
+              hideDownloadButton: false,
+              expandResponses: "200,201",
+              requiredPropsFirst: true,
+              theme: {
+                colors: { primary: { main: "#2457c5" } },
+                typography: {
+                  fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
+                  headings: { fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif" }
                 }
               }
-            }
-          },
-          document.getElementById("redoc-container"),
-          showError
-        );
+            },
+            document.getElementById("redoc-container")
+          );
+          if (result && typeof result.catch === "function") {
+            result.catch(function (error) {
+              showError("Redoc reported an initialization error: " + (error.message || error));
+            });
+          }
+        } catch (error) {
+          showError("Redoc initialization failed: " + (error.message || error));
+        }
       };
-      script.onerror = showError;
+      script.onerror = function () {
+        showError("The Redoc JavaScript bundle could not be downloaded from cdn.redoc.ly. Check network access or CDN blocking.");
+      };
       document.head.appendChild(script);
     })();
   </script>
