@@ -1,0 +1,18 @@
+flowchart TD
+    A[Approved engineering change records] --> B{Required fields complete?}
+    B -- No --> C[Request clarification]
+    C --> A
+    B -- Yes --> D[Risk triage]
+    D --> E[AI creates draft]
+    E --> F[Map claims to source IDs]
+    F --> G[Technical writer review]
+    G --> H{Facts and coverage verified?}
+    H -- No --> I[Correct or clarify]
+    I --> G
+    H -- Yes --> J{Specialist review required?}
+    J -- Yes --> K[Product / security / legal approval]
+    K --> L{Approved?}
+    L -- No --> I
+    L -- Yes --> M[Human publication]
+    J -- No --> M
+    M --> N[Measure quality and effort]

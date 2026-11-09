@@ -1,0 +1,62 @@
+{
+  "release": {
+    "release_id": "LedgerLite 1.8",
+    "target_publication_date": "2026-11-15",
+    "audience": "LedgerLite account administrators",
+    "source_revision": "demo-source-rev-01"
+  },
+  "changes": [
+    {
+      "change_id": "LL-2048",
+      "title": "Export filtered ledger entries",
+      "change_type": "feature",
+      "customer_impact": "Account administrators can export the currently filtered ledger-entry list as a CSV file.",
+      "availability": "Available to all paid plans from 2026-11-15.",
+      "prerequisites": "The user must have the Account Administrator role.",
+      "limitations": "CSV format only. A single export can contain up to 10000 rows.",
+      "source_owner": "LedgerLite Product",
+      "approval_status": "approved",
+      "audience": "Account administrators",
+      "internal_notes": "Do not mention the internal export worker implementation."
+    },
+    {
+      "change_id": "LL-2051",
+      "title": "Show currency in account activity filters",
+      "change_type": "enhancement",
+      "customer_impact": "The account activity filter now displays the account currency next to the account name.",
+      "availability": "Available to all customers from 2026-11-15.",
+      "prerequisites": "None.",
+      "limitations": "None.",
+      "source_owner": "LedgerLite Web Team",
+      "approval_status": "approved",
+      "audience": "All LedgerLite users",
+      "internal_notes": "UI-only change."
+    },
+    {
+      "change_id": "LL-2057",
+      "title": "Correct duplicate-entry warning",
+      "change_type": "fix",
+      "customer_impact": "The duplicate-entry warning is now shown when the same idempotency key is reused with a different request body.",
+      "availability": "Available to all API customers from 2026-11-15.",
+      "prerequisites": "None.",
+      "limitations": "This change does not prevent duplicates when clients use a new idempotency key for each retry.",
+      "source_owner": "Ledger API Team",
+      "approval_status": "approved",
+      "audience": "API integrators",
+      "internal_notes": "Do not claim broader duplicate prevention."
+    },
+    {
+      "change_id": "LL-2060",
+      "title": "Enable scheduled exports",
+      "change_type": "feature",
+      "customer_impact": "TBD.",
+      "availability": "Pending product decision.",
+      "prerequisites": "TBD.",
+      "limitations": "TBD.",
+      "source_owner": "LedgerLite Product",
+      "approval_status": "pending",
+      "audience": "TBD",
+      "internal_notes": "Exclude from this release pending approval."
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+release_id,source_revision,workflow_type,active_draft_minutes,active_review_minutes,total_active_minutes,claims_reviewed,unsupported_claims,omissions,factual_corrections,major_findings,critical_findings,first_pass_approved,notes
+LedgerLite-1.8,demo-source-rev-01,AI-assisted,,,,,,,,,,,,
