@@ -2,11 +2,17 @@
 
 Returns a page of ledger entries for an account.
 
-## Request
+> LedgerLite is fictional. The hostname is reserved for examples and cannot process requests.
+
+## Operation
 
 ```http
 GET /v1/accounts/{account_id}/ledger-entries
 ```
+
+**Required scope:** `ledger.entries:read`
+
+## Parameters
 
 ### Path parameter
 
@@ -19,18 +25,18 @@ GET /v1/accounts/{account_id}/ledger-entries
 | Parameter | Type | Required | Default | Constraints | Description |
 |---|---|---:|---:|---|---|
 | `limit` | integer | No | `20` | 1–100 | Maximum number of entries to return. |
-| `cursor` | string | No | — | Opaque cursor | Position from which to continue. |
+| `cursor` | string | No | — | Opaque string | Position from which to continue. |
 | `direction` | string | No | — | `credit` or `debit` | Filter by entry direction. |
 
-### Example request
+## Example request
 
 ```http
 GET /v1/accounts/acct_8f3a21/ledger-entries?limit=2&direction=credit
-Authorization: Bearer YOUR_ACCESS_TOKEN
+Authorization: Bearer EXAMPLE_ACCESS_TOKEN
 Accept: application/json
 ```
 
-### Success response
+## Successful response: first page
 
 `200 OK`
 
@@ -62,9 +68,7 @@ Accept: application/json
 }
 ```
 
-The cursor is illustrative and must be treated as opaque.
-
-### Request the next page
+## Request the next page
 
 Pass `next_cursor` unchanged as the `cursor` query parameter:
 
@@ -72,20 +76,39 @@ Pass `next_cursor` unchanged as the `cursor` query parameter:
 GET /v1/accounts/acct_8f3a21/ledger-entries?limit=2&direction=credit&cursor=eyJvZmZzZXQiOjJ9
 ```
 
-When no more results are available, `next_cursor` is `null`.
+When no more results are available, `next_cursor` is `null`. Example final-page response:
 
-## Responses
+```json
+{
+  "data": [
+    {
+      "id": "le_01J9M6A5B4C3D2E1F0G9H8I7JKLM",
+      "account_id": "acct_8f3a21",
+      "amount_minor": 2500,
+      "currency": "USD",
+      "direction": "debit",
+      "description": "Monthly service fee",
+      "status": "posted",
+      "created_at": "2026-10-13T07:15:00Z"
+    }
+  ],
+  "next_cursor": null
+}
+```
 
-| Status | Meaning |
-|---|---|
-| `200` | Page returned successfully. |
-| `400` | Invalid limit, cursor, or direction. |
-| `401` | Missing or invalid token. |
-| `403` | Caller lacks account read access. |
-| `404` | Account does not exist or is not visible. |
-| `429` | Rate limit exceeded. |
-| `500` | Unexpected server error. |
-| `503` | Service temporarily unavailable. |
+## Error responses
+
+| Status | Error code | Meaning |
+|---|---|---|
+| `400` | `invalid_request` | Invalid limit, cursor, or direction. |
+| `401` | `unauthorized` | Missing, invalid, or expired token. |
+| `403` | `forbidden` | Caller lacks account read access. |
+| `404` | `not_found` | Account does not exist or is not visible. |
+| `429` | `rate_limit_exceeded` | Rate limit exceeded. |
+| `500` | `internal_error` | Unexpected server error. |
+| `503` | `service_unavailable` | Service temporarily unavailable. |
+
+See [Errors](../errors.md) for response bodies and recommended corrective actions.
 
 ## Pagination guidance
 

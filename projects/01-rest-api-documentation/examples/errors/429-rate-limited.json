@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "rate_limit_exceeded",
+    "message": "Request rate limit exceeded. Retry after the indicated delay.",
+    "request_id": "req_7f31a6"
+  }
+}

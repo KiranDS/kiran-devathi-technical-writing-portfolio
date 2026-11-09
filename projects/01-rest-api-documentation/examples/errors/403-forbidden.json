@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "forbidden",
+    "message": "The access token does not grant ledger.entries:write for this account.",
+    "request_id": "req_7f31a4"
+  }
+}

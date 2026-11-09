@@ -2,37 +2,44 @@
 
 Creates an immutable ledger entry for an account.
 
-## Request
+> LedgerLite is fictional. The hostname is reserved for examples and cannot process requests.
+
+## Operation
 
 ```http
 POST /v1/ledger-entries
 ```
 
-### Required headers
+**Required scopes:** `ledger.entries:write`  
+**Idempotency:** Required through `Idempotency-Key`.
+
+## Request headers
 
 | Header | Required | Description |
 |---|---:|---|
-| `Authorization` | Yes | Bearer token with `ledger.entries:write` and account access. |
+| `Authorization` | Yes | Bearer token with `ledger.entries:write` and access to the target account. |
 | `Content-Type` | Yes | `application/json`. |
 | `Accept` | Recommended | `application/json`. |
-| `Idempotency-Key` | Yes | Unique key for this logical create operation. |
+| `Idempotency-Key` | Yes | Unique key for this logical create operation; 1–255 characters. |
 
-### Request body
+## Request body
 
 | Field | Type | Required | Constraints | Description |
 |---|---|---:|---|---|
 | `account_id` | string | Yes | Non-empty | Account to which the entry belongs. |
-| `amount_minor` | integer | Yes | Greater than zero | Amount in the currency's minor unit. |
-| `currency` | string | Yes | Three uppercase letters in this sample | Currency code, such as `USD`. |
+| `amount_minor` | integer | Yes | Minimum `1` | Positive amount in the currency's minor unit. For USD, `12550` represents USD 125.50. |
+| `currency` | string | Yes | `^[A-Z]{3}$` | Three-letter uppercase currency code. Supported currencies are not enumerated in this sample. |
 | `direction` | string | Yes | `credit` or `debit` | Whether the entry increases or decreases the ledger balance. |
 | `description` | string | Yes | 1–140 characters | Human-readable reason for the entry. |
 
-### Example request
+Unknown properties are not accepted by the sample request schema.
+
+## Example request
 
 ```http
 POST /v1/ledger-entries HTTP/1.1
 Host: api.ledgerlite.example
-Authorization: Bearer YOUR_ACCESS_TOKEN
+Authorization: Bearer EXAMPLE_ACCESS_TOKEN
 Content-Type: application/json
 Accept: application/json
 Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324
@@ -46,7 +53,7 @@ Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324
 }
 ```
 
-### Success response
+## Successful response
 
 `201 Created`
 
@@ -63,21 +70,33 @@ Idempotency-Key: 8e03978e-40d5-43e8-bc93-6894a57f9324
 }
 ```
 
-`201 Created` means the entry was created in this sample model. It does not imply payment settlement or funds availability.
+| Response field | Type | Description |
+|---|---|---|
+| `id` | string | Server-assigned immutable entry ID. |
+| `account_id` | string | Account associated with the entry. |
+| `amount_minor` | integer | Amount in currency minor units. |
+| `currency` | string | Three-letter uppercase currency code. |
+| `direction` | string | `credit` or `debit`. |
+| `description` | string | Description supplied in the request. |
+| `status` | string | `posted` in this sample model. |
+| `created_at` | string | UTC timestamp in RFC 3339 date-time format. |
 
-## Responses
+`201 Created` means the entry was created in this sample model. It does not imply settlement or funds availability.
 
-| Status | Meaning |
-|---|---|
-| `201` | Entry created. |
-| `400` | Invalid JSON or field validation error. |
-| `401` | Missing or invalid token. |
-| `403` | Missing scope or account permission. |
-| `404` | Account not found or not visible. |
-| `409` | Idempotency key reused with a different body. |
-| `429` | Rate limit exceeded. |
-| `500` | Unexpected server error. |
-| `503` | Service temporarily unavailable. |
+## Error responses
+
+| Status | Error code | Meaning |
+|---|---|---|
+| `400` | `invalid_request` | Invalid JSON or field validation error. |
+| `401` | `unauthorized` | Missing, invalid, or expired token. |
+| `403` | `forbidden` | Missing scope or account permission. |
+| `404` | `not_found` | Account does not exist or is not visible. |
+| `409` | `idempotency_key_reused` | Key was reused with a different request body. |
+| `429` | `rate_limit_exceeded` | Rate limit exceeded. |
+| `500` | `internal_error` | Unexpected server error. |
+| `503` | `service_unavailable` | Service temporarily unavailable. |
+
+See [Errors](../errors.md) for response bodies and recommended corrective actions.
 
 ## Retry behavior
 
@@ -85,4 +104,4 @@ If the client times out after sending the request, retry the same logical operat
 
 ## Implementation notes
 
-Validate positive integer amounts before sending, store the returned entry ID, and do not assume that entries can be edited or deleted.
+Validate positive integer amounts before sending, store the returned entry ID, and do not assume entries can be edited or deleted.

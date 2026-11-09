@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "invalid_request",
+    "message": "The amount_minor field must be greater than zero.",
+    "request_id": "req_7f31a2"
+  }
+}

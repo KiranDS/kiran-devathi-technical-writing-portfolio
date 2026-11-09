@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "unauthorized",
+    "message": "A valid bearer access token is required.",
+    "request_id": "req_7f31a3"
+  }
+}
